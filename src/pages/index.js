@@ -1,4 +1,5 @@
 import React from "react";
+import { Helmet } from "react-helmet";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import TextField from "@material-ui/core/TextField";
 import RadioGroup from "@material-ui/core/RadioGroup";
@@ -9,6 +10,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import Logo from "../images/logo.svg";
 
 export default function GetSubstring() {
   const [language, setLanguage] = React.useState("javascript");
@@ -99,9 +101,16 @@ export default function GetSubstring() {
       direction="column"
       spacing={3}
     >
+      <Helmet>
+        <meta charSet="utf-8" />
+        <link rel="icon" href={Logo} type="image/x-icon"></link>
+        <title>Get Substring</title>
+      </Helmet>
       <Grid item />
       <Grid item />
-      <Grid item />
+      <Grid item>
+        <img src={Logo} />
+      </Grid>
       <Grid item xs={12}>
         <Typography component="h1" variant="h5">
           Get Substring
