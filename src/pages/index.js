@@ -8,39 +8,27 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import FileCopyIcon from "@material-ui/icons/FileCopy";
-import FileCopyOutlinedIcon from "@material-ui/icons/FileCopyOutlined";
-import copy from "copy-to-clipboard";
-import IconButton from "@material-ui/core/IconButton";
-import Tooltip from "@material-ui/core/Tooltip";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 
 export default function GetSubstring() {
   const [language, setLanguage] = React.useState("javascript");
   const [initialString, setInitialString] = React.useState("");
-  const [initialize, setInitialize] = React.useState("");
-  const [substringCode, setSubstringCode] = React.useState("");
   const [showCode, setShowCode] = React.useState(false);
   const [showError, setShowError] = React.useState(false);
-  const [showCopy, setShowCopy] = React.useState(false);
-  const [showCopied, setShowCopied] = React.useState(false);
-  const [showCopiedIcon, setShowCopiedIcon] = React.useState(false);
+  const [code, setCode] = React.useState("");
+
+  const languages = [
+    { value: "javascript", label: "JavaScript" },
+    { value: "python", label: "Python" },
+    { value: "java", label: "Java" },
+    { value: "cpp", label: "C++" },
+    { value: "go", label: "Go" },
+    { value: "ruby", label: "Ruby" },
+  ];
 
   const reset = () => {
-    setShowCopied(false);
     setShowError(false);
     setShowCode(false);
-    setShowCopiedIcon(false);
-  };
-
-  const handleTooltipClose = () => {
-    setShowCopied(false);
-  };
-
-  const handleTooltipOpen = () => {
-    setShowCopied(true);
-    setShowCopiedIcon(true);
-    copy(`${initialize}${substringCode}`);
   };
 
   const handleLanguageChange = (event) => {
@@ -54,22 +42,52 @@ export default function GetSubstring() {
   };
 
   const generateCode = (start, end) => {
-    setInitialize(`const text = "${initialString}"\n`);
-    setSubstringCode(`const subString = text.substring(${start},${end})`);
+    let substring = "";
+    switch (language) {
+      case "javascript":
+        substring = `const text = "${initialString}";\nconst subString = text.substring(${start},${end});`;
+        break;
+      case "python":
+        start = start === 0 ? "" : start;
+        end = end === initialString.length - 1 ? "" : end;
+        substring = `text = "${initialString}"\nsubString = text[${start}:${end}]`;
+        break;
+      case "java":
+        end = end === initialString.length - 1 ? "" : end;
+        substring = `String text = "${initialString}";\nString subString = text.substring(${start},${end});`;
+        break;
+      case "cpp":
+        substring = `string text = "${initialString}";\nstring subString = text.substr(${start},${
+          end - start
+        });`;
+        break;
+      case "go":
+        substring = `text := "${initialString}"\nsubString := text[${start}:${end}]`;
+        break;
+      case "ruby":
+        substring = `text = "${initialString}"\nsubString = text[${start},${
+          end - start
+        }]`;
+        break;
+      default:
+        break;
+    }
+    setCode(substring);
     setShowCode(true);
   };
 
   const handleSubmit = (event) => {
     reset();
-    if (window.getSelection) {
-      const selection = window.getSelection();
-      const selectionStart = selection.anchorOffset;
-      const selectionEnd = selection.extentOffset;
-      if (selectionStart === selectionEnd) {
-        setShowError(true);
-      } else {
-        generateCode(selectionStart, selectionEnd);
-      }
+    const selection = window.getSelection();
+    const selectionStart = selection.anchorOffset;
+    const selectionEnd = selection.extentOffset;
+    if (selectionStart === selectionEnd) {
+      setShowError(true);
+    } else {
+      generateCode(
+        Math.min(selectionStart, selectionEnd),
+        Math.max(selectionStart, selectionEnd)
+      );
     }
   };
 
@@ -81,6 +99,9 @@ export default function GetSubstring() {
       direction="column"
       spacing={3}
     >
+      <Grid item />
+      <Grid item />
+      <Grid item />
       <Grid item xs={12}>
         <Typography component="h1" variant="h5">
           Get Substring
@@ -94,16 +115,17 @@ export default function GetSubstring() {
           onChange={handleLanguageChange}
           row
         >
-          <FormControlLabel
-            value="javascript"
-            control={<Radio />}
-            label="Javascript"
-          />
-          <FormControlLabel value="python" control={<Radio />} label="Python" />
+          {languages.map((item) => (
+            <FormControlLabel
+              value={item.value}
+              control={<Radio />}
+              label={item.label}
+            />
+          ))}
         </RadioGroup>
       </Grid>
       <Grid container>
-        <Grid item xs={2} lg={4}></Grid>
+        <Grid item xs={2} lg={4} />
         <Grid item xs={8} lg={4}>
           <TextField
             id="initialString"
@@ -116,11 +138,11 @@ export default function GetSubstring() {
             multiline
           />
         </Grid>
-        <Grid item xs={2} lg={4}></Grid>
+        <Grid item xs={2} lg={4} />
       </Grid>
       <br />
       <Grid container>
-        <Grid item xs={2} lg={4}></Grid>
+        <Grid item xs={2} lg={4} />
         <Grid item xs={8} lg={4}>
           <Card variant="outlined">
             <CardContent>
@@ -143,7 +165,7 @@ export default function GetSubstring() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={2} lg={4}></Grid>
+        <Grid item xs={2} lg={4} />
       </Grid>
       <Grid item>
         <Button
@@ -157,62 +179,13 @@ export default function GetSubstring() {
       </Grid>
       {showCode && (
         <Grid container>
-          <Grid item xs={2} lg={4}></Grid>
+          <Grid item xs={2} lg={4} />
           <Grid item xs={8} lg={4}>
-            <Card
-              variant="outlined"
-              onMouseEnter={() => setShowCopy(true)}
-              onMouseLeave={() => {
-                setShowCopy(false);
-                setShowCopied(false);
-              }}
-            >
-              <CardContent>
-                <Grid container>
-                  <Grid item xs={11}>
-                    <Typography align="center" variant="caption">
-                      {initialize}
-                    </Typography>
-                    <br />
-                    <Typography align="center" variant="caption">
-                      {substringCode}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={1}>
-                    {showCopy && (
-                      <ClickAwayListener onClickAway={handleTooltipClose}>
-                        <div>
-                          <Tooltip
-                            PopperProps={{
-                              disablePortal: true,
-                            }}
-                            onClose={handleTooltipClose}
-                            open={showCopied}
-                            disableFocusListener
-                            disableHoverListener
-                            disableTouchListener
-                            title="Copied!"
-                          >
-                            <IconButton
-                              size="small"
-                              onClick={handleTooltipOpen}
-                            >
-                              {showCopiedIcon ? (
-                                <FileCopyIcon />
-                              ) : (
-                                <FileCopyOutlinedIcon />
-                              )}
-                            </IconButton>
-                          </Tooltip>
-                        </div>
-                      </ClickAwayListener>
-                    )}
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
+            <SyntaxHighlighter language={language} wrapLongLines={true}>
+              {code}
+            </SyntaxHighlighter>
           </Grid>
-          <Grid item xs={2} lg={4}></Grid>
+          <Grid item xs={2} lg={4} />
         </Grid>
       )}
     </Grid>
