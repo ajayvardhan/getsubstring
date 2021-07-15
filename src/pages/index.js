@@ -36,6 +36,7 @@ export default function GetSubstring() {
   const handleLanguageChange = (event) => {
     reset();
     setLanguage(event.target.value);
+    handleSubmit();
   };
 
   const handleInitialStringChange = (event) => {
@@ -78,7 +79,7 @@ export default function GetSubstring() {
     setShowCode(true);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = () => {
     reset();
     const selection = window.getSelection();
     const selectionStart = selection.anchorOffset;
@@ -109,14 +110,14 @@ export default function GetSubstring() {
       <Grid item />
       <Grid item />
       <Grid item>
-        <img src={Logo} />
+        <img src={Logo} alt="Logo" />
       </Grid>
-      <Grid item xs={12}>
+      <Grid item>
         <Typography component="h1" variant="h5">
           Get Substring
         </Typography>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item>
         <RadioGroup
           aria-label="language"
           name="language"
