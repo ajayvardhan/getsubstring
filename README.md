@@ -1,12 +1,10 @@
-# Project Title
+# Get Substring
 
 Get Substring
 
 ## Description
 
 Generate substring code for the text you want. Just give your initial string, select the part of the string that that you need to extract and get substring code snippet for it in the selected language!
-
-## Getting Started
 
 ### Dependencies
 
